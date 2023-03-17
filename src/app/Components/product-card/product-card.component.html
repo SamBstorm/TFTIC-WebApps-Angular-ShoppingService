@@ -1,0 +1,11 @@
+<div>
+  <p><strong>{{product.name}}</strong></p>
+  <p [ngStyle]="{'text-decoration' : ((product.promo)?'line-through':'none') }">{{product.price | currency : 'EUR' :'symbol':'1.2-2'}}</p>
+  <p *ngIf="product.promo" [ngStyle]="{color : 'red', 'font-weight' : 800}">{{product.promo | currency :'EUR' :'symbol':'1.2-2'}}</p>
+  <p>{{product.quantity}}</p>
+  <div>
+    <button (click)="addOne()">+</button>
+    <button (click)="subOne()">-</button>
+    <button (click)="delete()">Supprimer</button>
+  </div>
+</div>
