@@ -1,33 +1,35 @@
+import { ShoppingService } from './../../Services/shopping.service';
 import { IProduct } from './../../Models/iproduct';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
 
 @Component({
   selector: 'app-product-card',
   templateUrl: './product-card.component.html',
   styleUrls: ['./product-card.component.scss']
 })
-export class ProductCardComponent {
-  @Input() product! : IProduct;
-  @Output() deleteEmitter : EventEmitter<number>;
-  @Output() addEmitter : EventEmitter<number>;
-  @Output() subEmitter : EventEmitter<number>;
+export class ProductCardComponent implements OnInit {
+  @Input() id! : number;
+  product! : IProduct;
+  @Output() refreshEvent : EventEmitter<null> = new EventEmitter();
 
-  constructor(){
-    this.deleteEmitter = new EventEmitter<number>();
-    this.addEmitter = new EventEmitter<number>();
-    this.subEmitter = new EventEmitter<number>();
+  constructor(private _service : ShoppingService){}
+
+  ngOnInit(): void {
+    this.product = this._service.getOne(this.id);
   }
 
   delete() : void{
-    this.deleteEmitter.next(this.product.id);
+    this._service.delete(this.id);
+    this.refreshEvent.next(null);
   }
 
   addOne() : void{
-    this.addEmitter.next(this.product.id);
-
+    this._service.addQuantity(this.id);
+    this.refreshEvent.next(null);
   }
 
   subOne() : void{
-    this.subEmitter.next(this.product.id);
+    this._service.subQuantity(this.id);
+    this.refreshEvent.next(null);
   }
 }

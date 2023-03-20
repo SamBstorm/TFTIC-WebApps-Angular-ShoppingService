@@ -1,35 +1,27 @@
+import { ShoppingService } from './../../Services/shopping.service';
 import { IProduct } from './../../Models/iproduct';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
 @Component({
   selector: 'app-shopping-list',
   templateUrl: './shopping-list.component.html',
   styleUrls: ['./shopping-list.component.scss']
 })
-export class ShoppingListComponent {
-  products : IProduct[] = [
-    {id : 1, name:"Pomme", price:0.99, promo:0.5, quantity:6}
-  ];
+export class ShoppingListComponent implements OnInit {
+  products : IProduct[] = [];
 
   name! : string;
   price! : number;
   promo? : number;
   quantity! : number;
 
-  total : number;
+  total! : number;
 
-  constructor(){
-    this.total = this.CalculTotal();
+  constructor(private _service: ShoppingService){}
+
+  ngOnInit(): void {
+    this.onRefresh();
   }
-
-  CalculTotal() : number {
-    return this.products
-                  .map(
-                      p => p.quantity * ( (p.promo)? p.promo : p.price)
-                    )
-                  .reduce(
-                    (sum, value) => sum + value, 0
-                    )}
 
   AddProduct(): void{
     if(!this.name || this.name.trim().length <= 0 ) {
@@ -49,15 +41,15 @@ export class ShoppingListComponent {
       return;
     }
     let newProduct : IProduct = {
-      id : (this.products.length > 0) ? Math.max(... this.products.map( p => p.id)) + 1 : 1,
+      id : 0,
       name : this.name.trim(),
       price : this.price,
       promo : this.promo,
       quantity : this.quantity
     };
-    this.products.push(newProduct);
+    this._service.insert(newProduct);
     this.clearFormular();
-    this.total = this.CalculTotal();
+    this.onRefresh();
   }
 
   private clearFormular(){
@@ -66,22 +58,8 @@ export class ShoppingListComponent {
     this.promo = undefined;
     this.quantity = 0;
   }
-
-  onDelete(productId : number) : void{
-    this.products = this.products.filter(p => p.id != productId);
-    this.total = this.CalculTotal();
-  }
-
-  onAdd(productId : number) : void {
-    let prod : IProduct | undefined = this.products.find(p => p.id == productId);
-    if(prod){ prod.quantity ++; }
-    this.total = this.CalculTotal();
-  }
-
-  onSub(productId : number) : void {
-    let prod : IProduct | undefined = this.products.find(p => p.id == productId);
-    if(prod && prod.quantity <= 1) this.onDelete(productId);
-    else if(prod) prod.quantity --;
-    this.total = this.CalculTotal();
+  public onRefresh():void{
+    this.products = this._service.getAll();
+    this.total = this._service.calculTotal();
   }
 }

@@ -20,7 +20,7 @@
 <div>
   <ul>
     <li *ngFor="let p of products">
-      <app-product-card [product]="p" (deleteEmitter)="onDelete($event)" (addEmitter)="onAdd($event)" (subEmitter)="onSub($event)"></app-product-card>
+      <app-product-card [id]="p.id" (refreshEvent)="onRefresh()"></app-product-card>
     </li>
   </ul>
   <div>Le total est : {{total | currency :'EUR' :'symbol':'1.2-2'}}</div>
